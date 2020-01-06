@@ -1,0 +1,54 @@
+# This file inserts only all the objects required for the simulation, whitout
+# assigning any value to their properties. Thus all objects will be placed one 
+# over the other.
+
+
+deleteall;
+
+# set project directories
+lib_dir = "Lumerical-Objects/";                                    # library directory relative to root
+
+cd(lib_dir);
+
+addfdtd;
+
+# elements in the personal library
+
+
+circular_cavity;
+set('name','circular cavity');
+
+spiral_outcoupler;
+set('name','outcoupler spiral groove');
+
+# elements in the standard library
+
+adddipole;
+set('name','TM source');
+
+# monitors
+
+addindex;
+set('name','monitor xy');
+
+# analysis from personal library
+
+spectral_analysis_sphere;
+set('name','resonance finder outside');
+set('monitors at boundaries',1);
+set('domain dimensions',2);
+
+spectral_analysis_sphere;
+set('name','resonance finder inside');
+set('monitors at boundaries',0);
+set('domain dimensions',2);
+
+
+# save the project in .fps and open the setup script
+cd('../');
+
+save('circular_cavity_on_pmma');
+
+
+
+

@@ -1,0 +1,108 @@
+# This file contains all the parameter that are useful to be varied during the simulation.
+
+# source
+lambda=570e-9;
+width=30e-9;
+
+# multilayer
+design_file = 'Lumerical-Objects/multilayer_design/best_design.ldf';
+loaddata(design_file);  # contains layer description (n1, d, effective indeces)
+thickness = 75e-9;
+
+# cavity and outcoupler on pmma
+N_dbr = 30;
+N_outcoupler = 10;
+cavity_diameter = 612e-9;
+period_dbr = 245e-9;
+period_outcoupler = lambda/n_eff;
+spacing_cavity_outcoupler = 1000e-9;#500e-9;
+spacing_after_outcoupler = 100e-9;
+
+# domain
+L=cavity_diameter+2*(N_dbr*period_dbr+spacing_cavity_outcoupler+
+               N_outcoupler*period_outcoupler+period_outcoupler+spacing_after_outcoupler);
+PML_extension_xy=1e-6;
+PML_extension_z=1e-6;
+d_air=800e-9;
+
+# set simulation parameter
+#load(".fps");
+
+select("FDTD");
+    set("x",0);
+    set("y",0);
+    set("x span",L);
+    set("y span",L);
+    set("dimension","2D");
+    set("background index",n_eff1);
+    set("simulation time",10000e-15);
+    set("auto shutoff min",1e-5);
+    set("mesh accuracy",5);
+    
+  
+    
+select("circular cavity");
+    set("N_periods", N_dbr);
+    set("D",cavity_diameter);
+    set("period",period_dbr);
+    set("thickness",thickness);
+    set("n_groove",n_eff3);
+    set("z min", -thickness/2);
+
+select("outcoupler spiral groove");
+    set("index groove",1);
+    set("n rings",N_outcoupler);
+    set("topological charge",2);
+    set("thickness",thickness);
+    set("resolution",50);
+    set("start radius",cavity_diameter/2+N_dbr*period_dbr+spacing_cavity_outcoupler);
+    set("dbr period",period_outcoupler);
+    set("z min", -thickness/2);
+    
+
+# sources and monitors
+
+select("TM source");
+    set("x",0);
+    set("y",0);
+    set("z",0);
+    set("override global source settings",1);
+    set("set wavelength",1);
+    set("optimize for short pulse",0);
+    set("center wavelength",lambda);
+    set("wavelength span",width);
+    set("phase",0);
+    set("theta",0);
+    set("phi",0);
+    set("dipole type","Electric Dipole");
+
+
+#select("video_XY");
+    #set("x",0);
+    #set("y",0);
+    #set("x span",L/2);
+    #set("y span",L/2);
+    #set("z",d_pmma/2);
+        
+    
+select("resonance finder outside");
+    set("radius",cavity_diameter/2+N_dbr*period_dbr+spacing_cavity_outcoupler/2);
+    set("z",0);
+
+select("resonance finder inside");
+    set("x",0);
+    set("y",0);
+    set("radius",cavity_diameter/2);
+    set("z",0);
+        
+select("monitor xy");
+    set('monitor type', '2D Z-normal');
+    set("x",0);
+    set("y",0);
+    set("x span",L);
+    set("y span",L);
+    set("z",0);
+
+select("");
+
+# simulation
