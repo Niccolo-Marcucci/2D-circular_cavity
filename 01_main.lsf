@@ -12,9 +12,9 @@ thickness = 75e-9;
 # cavity and outcoupler on pmma
 N_dbr = 30;
 N_outcoupler = 10;
-cavity_diameter = 612e-9;
-period_dbr = 245e-9;
-period_outcoupler = lambda/n_eff;
+cavity_diameter = 630e-9;
+period_dbr = 265e-9;
+period_outcoupler = lambda/n_eff1;
 spacing_cavity_outcoupler = 1000e-9;#500e-9;
 spacing_after_outcoupler = 100e-9;
 
@@ -26,7 +26,7 @@ PML_extension_z=1e-6;
 d_air=800e-9;
 
 # set simulation parameter
-#load(".fps");
+#load("circular_cavity_on_pmma.fps");
 
 select("FDTD");
     set("x",0);
@@ -37,7 +37,7 @@ select("FDTD");
     set("background index",n_eff1);
     set("simulation time",10000e-15);
     set("auto shutoff min",1e-5);
-    set("mesh accuracy",5);
+    set("mesh accuracy",4);
     
   
     
@@ -46,7 +46,7 @@ select("circular cavity");
     set("D",cavity_diameter);
     set("period",period_dbr);
     set("thickness",thickness);
-    set("n_groove",n_eff3);
+    set("n_groove",n_eff2);
     set("z min", -thickness/2);
 
 select("outcoupler spiral groove");
