@@ -12,7 +12,7 @@ thickness = 75e-9;
 # cavity and outcoupler on pmma
 N_dbr = 30;
 N_outcoupler = 10;
-cavity_diameter = 630e-9;
+cavity_diameter = 640e-9;
 period_dbr = 265e-9;
 period_outcoupler = lambda/n_eff1;
 spacing_cavity_outcoupler = 1000e-9;#500e-9;
@@ -35,7 +35,7 @@ select("FDTD");
     set("y span",L);
     set("dimension","2D");
     set("background index",n_eff1);
-    set("simulation time",10000e-15);
+    set("simulation time",20000e-15);
     set("auto shutoff min",1e-5);
     set("mesh accuracy",4);
     
@@ -106,3 +106,8 @@ select("monitor xy");
 select("");
 
 # simulation
+
+run;
+
+# Bip sound after finishing
+system("powershell -c [console]::beep(1000,10000)"); # valid for windows only ([Hz],[ms])
