@@ -1,0 +1,19 @@
+main_dir=pwd;
+name="circular_cavity_on_pmma";
+load(name);
+cd(main_dir);
+folder='sweeps';
+for (diameter = linspace(350,650,10)*1e-9) {
+    load(name);
+    cd(main_dir);
+    select("circular cavity");
+        set("D",diameter);
+    save(folder+'/'+name+'_diam'+num2str(diameter));
+    run;
+    cd(main_dir);
+    
+    s= getresult("resonance finder outside",'spectrum');
+    l= getresult("resonance finder outside",'lambda');
+    ?getresult("resonance finder outside",'Q');
+    #plot(l,s);
+}

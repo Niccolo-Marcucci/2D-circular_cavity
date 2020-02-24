@@ -14,7 +14,7 @@ N_dbr = 30;
 N_outcoupler = 10;
 cavity_diameter = 640e-9;
 period_dbr = 265e-9;
-period_outcoupler = lambda/n_eff1;
+period_outcoupler = lambda/n_eff3;
 spacing_cavity_outcoupler = 1000e-9;#500e-9;
 spacing_after_outcoupler = 100e-9;
 
@@ -34,12 +34,10 @@ select("FDTD");
     set("x span",L);
     set("y span",L);
     set("dimension","2D");
-    set("background index",n_eff1);
+    set("background index",n_eff3);
     set("simulation time",20000e-15);
     set("auto shutoff min",1e-5);
     set("mesh accuracy",4);
-    
-  
     
 select("circular cavity");
     set("N_periods", N_dbr);
@@ -50,7 +48,7 @@ select("circular cavity");
     set("z min", -thickness/2);
 
 select("outcoupler spiral groove");
-    set("index groove",1);
+    set("index groove",n_eff2);
     set("n rings",N_outcoupler);
     set("topological charge",2);
     set("thickness",thickness);
@@ -58,6 +56,7 @@ select("outcoupler spiral groove");
     set("start radius",cavity_diameter/2+N_dbr*period_dbr+spacing_cavity_outcoupler);
     set("dbr period",period_outcoupler);
     set("z min", -thickness/2);
+    set('enabled',0);
     
 
 # sources and monitors
@@ -107,7 +106,8 @@ select("");
 
 # simulation
 
-run;
+#run;
 
 # Bip sound after finishing
-system("powershell -c [console]::beep(1000,10000)"); # valid for windows only ([Hz],[ms])
+system("speaker-test -t sine -f 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
+#system("powershell -c [console]::beep(1000,10000)"); # valid for windows only ([Hz],[ms])
