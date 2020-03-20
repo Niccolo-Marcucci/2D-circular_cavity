@@ -1,19 +1,29 @@
 # This file contains all the parameter that are useful to be varied during the simulation.
+# all other quantities that it is known that are
 
+main_dir = pwd; 
+
+sim_name = 'circular_cavity_on_guiding_substrate';
+details = '';
+filename = sim_name + details;
+load(filename);
+cd(main_dir);
+
+newdetails = '_period187';
 # source
 lambda=570e-9;
 width=30e-9;
 
 # multilayer
-design_file = 'Lumerical-Objects/multilayer_design/best_design.ldf';
-loaddata(design_file);  # contains layer description (n1, d, effective indeces)
+design_file = 'Lumerical-Objects/multilayer_design/designs/design_TM_guided.mat';
+matlabload(design_file);  # contains layer description (n1, d, effective indeces)
 thickness = 75e-9;
 
 # cavity and outcoupler on pmma
-N_dbr = 30;
+N_dbr = 50;
 N_outcoupler = 10;
-cavity_diameter = 640e-9;
-period_dbr = 265e-9;
+cavity_diameter = 400e-9;
+period_dbr = 187e-9;
 period_outcoupler = lambda/n_eff3;
 spacing_cavity_outcoupler = 1000e-9;#500e-9;
 spacing_after_outcoupler = 100e-9;
@@ -104,10 +114,10 @@ select("monitor xy");
 
 select("");
 
-# simulation
-
+filename = sim_name + newdetails ;
+save(filename);
 #run;
-
+cd(main_dir);
 # Bip sound after finishing
-system("speaker-test -t sine -f 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
+system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
 #system("powershell -c [console]::beep(1000,10000)"); # valid for windows only ([Hz],[ms])

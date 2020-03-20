@@ -1,0 +1,27 @@
+# This file contains all the parameter that are useful to be varied during the simulation.
+# all other quantities that it is known that are
+
+main_dir = pwd; 
+
+sim_name = 'circular_cavity_on_guiding_substrate';
+details = '_period187';
+filename = sim_name + details;
+load(filename);
+cd(main_dir);
+
+
+folder='sweeps';
+for (diameter = linspace(350,650,10)*1e-9) {
+    load(filename);
+    cd(main_dir);
+    select("circular cavity");
+        set("D",diameter);
+    save(folder+'/'+filename+'_diam'+num2str(diameter*1e9));
+    run;
+    cd(main_dir);
+    
+    s= getresult("resonance finder outside",'spectrum');
+    l= getresult("resonance finder outside",'lambda');
+    ?getresult("resonance finder outside",'Q');
+    #plot(l,s);
+}

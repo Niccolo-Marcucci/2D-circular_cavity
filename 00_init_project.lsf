@@ -44,10 +44,10 @@ set('monitors at boundaries',0);
 set('domain dimensions',2);
 
 
-# save the project in .fps and open the setup script
+# save the project 
 cd('../');
 
-save('circular_cavity_on_pmma');
+save('circular_cavity_on_guiding_substrate');
 
 
 
