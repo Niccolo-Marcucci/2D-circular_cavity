@@ -1,22 +1,21 @@
-# This file contains all the parameter that are useful to be varied during the simulation.
-# all other quantities that it is known that are
+# This code is useful for performing sweep on the cavity central spacer in such a way
+# to tune the resonance frequency
 
 main_dir = pwd; 
 
-sim_name = 'circular_cavity_on_guiding_substrate';
-details = '_period187';
-filename = sim_name + details;
-load(filename);
-cd(main_dir);
+sim_name = 'circular_cavity';
+folder = 'SIM01_'+ sim_name;
+sim_name = 'circular_cavity';
+details = '_base';
+filename = folder +'/'+ sim_name + details + '.fsp';
 
-
-folder='sweeps';
-for (diameter = linspace(350,650,10)*1e-9) {
+for (diameter = round(linspace(350,650,10))*1e-9) {
     load(filename);
     cd(main_dir);
     select("circular cavity");
         set("D",diameter);
-    save(folder+'/'+filename+'_diam'+num2str(diameter*1e9));
+    newfilename = folder + '/' + 'sweeps' +'/'+ sim_name + details+'_Diam'+num2str(diameter*1e9) + '.fsp';
+    save(newfilename);
     run;
     cd(main_dir);
     

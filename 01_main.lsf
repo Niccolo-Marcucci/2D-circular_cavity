@@ -3,13 +3,16 @@
 
 main_dir = pwd; 
 
-sim_name = 'circular_cavity_on_guiding_substrate';
-details = '';
-filename = sim_name + details;
+sim_name = 'circular_cavity';
+folder = 'SIM01_'+ sim_name;
+details = '_base';
+filename = folder +'/'+ sim_name + details + '.fsp';
 load(filename);
 cd(main_dir);
 
-newdetails = '_period187';
+newdetails = '_TM_guided';
+pattern_type = 'positive';
+
 # source
 lambda=570e-9;
 width=30e-9;
@@ -20,17 +23,24 @@ matlabload(design_file);  # contains layer description (n1, d, effective indeces
 thickness = 75e-9;
 
 # cavity and outcoupler on pmma
+if (pattern_type == 'positive') {
+    n_groove = min([n_eff1,n_eff3]);
+    n_spacer = max([n_eff1,n_eff3]);
+} else if (pattern_type == 'negative'){
+    n_groove = max([n_eff1,n_eff3]);
+    n_spacer = min([n_eff1,n_eff3]);
+} else {
+    unkown_name;          # should send an error
+}
 N_dbr = 50;
-N_outcoupler = 10;
 cavity_diameter = 400e-9;
-period_dbr = 187e-9;
-period_outcoupler = lambda/n_eff3;
-spacing_cavity_outcoupler = 1000e-9;#500e-9;
-spacing_after_outcoupler = 100e-9;
+period_dbr = round(lambda/(n_eff1+n_eff3)*1e9)*1e-9;
+spacing_after_cavity = 1000e-9;
+
+newdetails = newdetails +'_N'+ num2str(N_dbr) +'_'+ pattern_type;
 
 # domain
-L=cavity_diameter+2*(N_dbr*period_dbr+spacing_cavity_outcoupler+
-               N_outcoupler*period_outcoupler+period_outcoupler+spacing_after_outcoupler);
+L=cavity_diameter+2*(N_dbr*period_dbr+spacing_after_cavity);
 PML_extension_xy=1e-6;
 PML_extension_z=1e-6;
 d_air=800e-9;
@@ -44,30 +54,22 @@ select("FDTD");
     set("x span",L);
     set("y span",L);
     set("dimension","2D");
-    set("background index",n_eff3);
+    set("background index",n_spacer);
     set("simulation time",20000e-15);
     set("auto shutoff min",1e-5);
     set("mesh accuracy",4);
+    set("x min bc",'Symmetric');
+    set("y min bc",'Symmetric');
+
     
 select("circular cavity");
     set("N_periods", N_dbr);
     set("D",cavity_diameter);
     set("period",period_dbr);
     set("thickness",thickness);
-    set("n_groove",n_eff2);
+    set("n_groove",n_groove);
     set("z min", -thickness/2);
 
-select("outcoupler spiral groove");
-    set("index groove",n_eff2);
-    set("n rings",N_outcoupler);
-    set("topological charge",2);
-    set("thickness",thickness);
-    set("resolution",50);
-    set("start radius",cavity_diameter/2+N_dbr*period_dbr+spacing_cavity_outcoupler);
-    set("dbr period",period_outcoupler);
-    set("z min", -thickness/2);
-    set('enabled',0);
-    
 
 # sources and monitors
 
@@ -95,7 +97,7 @@ select("TM source");
         
     
 select("resonance finder outside");
-    set("radius",cavity_diameter/2+N_dbr*period_dbr+spacing_cavity_outcoupler/2);
+    set("radius",cavity_diameter/2+N_dbr*period_dbr+spacing_after_outcoupler/2);
     set("z",0);
 
 select("resonance finder inside");
@@ -114,10 +116,10 @@ select("monitor xy");
 
 select("");
 
-filename = sim_name + newdetails ;
+filename = folder +'/'+ sim_name + newdetails + '.fsp';
 save(filename);
 #run;
 cd(main_dir);
 # Bip sound after finishing
-system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
-#system("powershell -c [console]::beep(1000,10000)"); # valid for windows only ([Hz],[ms])
+#system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
+system("powershell -c [console]::beep(500,500)"); # valid for windows only ([Hz],[ms])

@@ -1,0 +1,49 @@
+clear;
+main_dir = pwd; 
+
+
+main_dir = pwd;
+
+sim_name = 'circular_cavity';
+folder = 'SIM01_'+ sim_name;
+
+for (i=1:8) {
+    if (i==1) {
+        details = '_design_gd3_positive';
+    }else if (i==2){
+        details = '_design_gd3_negative';  
+        D=250;
+        N=40;
+        period_DBR=165;      
+    }else if (i==3){
+        details = '_design_gd4_positive';      
+    }else if (i==4){
+        details = '_design8';       
+    }else if (i==5){
+        details = '_designDesc_30';  
+    }else if (i==6){
+        details = '_designDesc_35';  
+    }else if (i==7){
+        details = '_design_Bad9'; 
+    }else if (i==8){
+        details = '_design_Bad';         
+    }
+    filename = folder +'/'+ sim_name + details + '.fsp';
+    load(filename);
+    cd(main_dir);
+    
+    quality=getresult('resonance finder outside','Q');
+    spectrum_out=getresult('resonance finder outside','spectrum');
+    lambda_out=getresult('resonance finder outside','lambda');
+    spectrum_in=getresult('resonance finder inside','spectrum');
+    lambda_in=getresult('resonance finder inside','lambda');
+    select('circular cavity');
+        D=get('D');
+        N=get('N_periods');
+        period_DBR=get('period');
+    
+    closeall;
+    
+    matlabsave('spectra/spectrum'+ details + '.mat',quality,lambda_out,spectrum_out,lambda_in,spectrum_in,D,N,period_DBR);
+}
+system("powershell -c [console]::beep(500,500)");

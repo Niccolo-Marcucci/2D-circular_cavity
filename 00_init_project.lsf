@@ -8,6 +8,13 @@ deleteall;
 # set project directories
 lib_dir = "Lumerical-Objects/";                                    # library directory relative to root
 
+main_dir = pwd;
+
+sim_name = 'circular_cavity';
+folder = 'SIM01_'+ sim_name;
+details = '_base';
+filename = folder +'/'+ sim_name + details + '.fsp';
+
 cd(lib_dir);
 
 addfdtd;
@@ -17,9 +24,6 @@ addfdtd;
 
 circular_cavity;
 set('name','circular cavity');
-
-spiral_outcoupler;
-set('name','outcoupler spiral groove');
 
 # elements in the standard library
 
@@ -45,9 +49,10 @@ set('domain dimensions',2);
 
 
 # save the project 
-cd('../');
+cd(main_dir);
 
-save('circular_cavity_on_guiding_substrate');
+save(filename);
+cd(main_dir);
 
 
 
