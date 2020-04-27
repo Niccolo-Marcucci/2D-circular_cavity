@@ -3,14 +3,14 @@
 
 main_dir = pwd; 
 
-sim_name = 'circular_cavity';
-folder = 'SIM01_'+ sim_name;
+sim_name = 'test_mode_coupling';
+folder = 'SIM02_'+ sim_name;
 details = '_base';
 filename = folder +'/'+ sim_name + details + '.fsp';
 load(filename);
 cd(main_dir);
 
-newdetails = '_TM_guided';
+newdetails = '_TM_gd3_buriedDBR';
 pattern_type = 'positive';
 
 # source
@@ -18,7 +18,7 @@ lambda=570e-9;
 width=30e-9;
 
 # multilayer
-design_file = 'Lumerical-Objects/multilayer_design/designs/design_TM_guided.mat';
+design_file = 'Lumerical-Objects/multilayer_design/designs/design_TM_gd3_buriedDBR.mat';
 matlabload(design_file);  # contains layer description (n1, d, effective indeces)
 thickness = 75e-9;
 
@@ -97,7 +97,7 @@ select("TM source");
         
     
 select("resonance finder outside");
-    set("radius",cavity_diameter/2+N_dbr*period_dbr+spacing_after_outcoupler/2);
+    set("radius",cavity_diameter/2+N_dbr*period_dbr+spacing_after_cavity/2);
     set("z",0);
 
 select("resonance finder inside");
@@ -118,8 +118,8 @@ select("");
 
 filename = folder +'/'+ sim_name + newdetails + '.fsp';
 save(filename);
-#run;
+run;
 cd(main_dir);
 # Bip sound after finishing
-#system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
-system("powershell -c [console]::beep(500,500)"); # valid for windows only ([Hz],[ms])
+system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
+#system("powershell -c [console]::beep(500,500)"); # valid for windows only ([Hz],[ms])

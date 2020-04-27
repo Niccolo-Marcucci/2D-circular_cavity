@@ -1,0 +1,25 @@
+
+main_dir = pwd; 
+
+sim_name = 'test_mode_coupling';
+folder = 'SIM02_'+ sim_name;
+details = '_TM_gd3_buriedDBR_N30_positive';
+filename = folder +'/'+ sim_name + details + '.fsp';
+load(filename);
+cd(main_dir);
+
+select("circular cavity");
+radius=get("D")/2;
+for (pos=radius/(1:10)) {
+    switchtolayout;
+    select("TM source");
+    set("x",pos);
+    set("y",pos);
+    run;
+    cd(main_dir);    
+    ?getresult("resonance finder outside",'Q');
+    P=getresult("field",'P');
+    E=getresult("field",'E');
+    H=getresult("field",'H');
+    visualize(E,P,H);   
+}
