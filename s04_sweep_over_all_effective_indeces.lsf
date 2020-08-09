@@ -1,0 +1,72 @@
+clear;
+main_dir = pwd; 
+
+sim_name = 'variability_study';
+folder = 'SIM04_'+ sim_name;
+
+materialname_H="A_Hi_eff_index";
+materialname_L="A_Lo_eff_index";
+
+#if(findstring(setmaterial,newmaterialname) <= 0 ) { #add material if it does not already exist
+  #tempname = addmaterial("Sampled data");
+  #setmaterial(tempname,"name",newmaterialname);
+#}
+lambda=540:15:600;
+f=c/(lambda*1e-9);
+x=c/((450:1:650)*1e-9);
+dataset=readdata('./'+folder+'/TM_Descrovi_eff_index_values-LAMBDA'+num2str(lambda(1))+'.csv');
+dataset=zeros(length(f),length(dataset(:,1)),length(dataset(1,:)));
+
+for (i=1:length(f)){
+    dataset(i,:,:)=readdata('./'+folder+'/TM_Descrovi_eff_index_values-LAMBDA'+num2str(lambda(i))+'.csv');
+}
+
+FIT_N=2;
+for (j=1:10:101){#0:length(dataset(1,:,1))) {
+    n_prime =  pinch(dataset(:,j,2));
+    n_pprime= pinch(dataset(:,j,3));
+    
+    n_prime_fit = spline(n_prime,f,x);
+    n_pprime_fit = spline(n_pprime,f,x);
+     
+    eps_H=(n_prime_fit+1i*n_pprime_fit)^2;
+    
+    #loading the data to the new material
+    newmaterialname=materialname_H+num2str(j);
+    if(findstring(setmaterial,newmaterialname) <= 0 ) { #add material if it does not already exist
+      tempname = addmaterial("Sampled data");
+      setmaterial(tempname,"name",newmaterialname);
+    }
+    setmaterial(newmaterialname,"sampled data",[x,eps_H]);
+    setmaterial(newmaterialname,"improve numerical stability",false); # set false to obtain a better fit
+    setmaterial(newmaterialname,"specify fit range",true); 
+    setmaterial(newmaterialname,"make fit passive",false); 
+    setmaterial(newmaterialname,"wavelength min",0.45e-6); # set false to obtain a better fit
+    setmaterial(newmaterialname,"wavelength max",0.65e-6); # set false to obtain a better fit
+    
+    n_prime =  pinch(dataset(:,j,6));
+    n_pprime= pinch(dataset(:,j,7));
+    
+    n_prime_fit = spline(n_prime,f,x);
+    n_pprime_fit = spline(n_pprime,f,x);
+    
+    eps_L=(n_prime_fit+1i*n_pprime_fit)^2;
+
+    plot(x,n_pprime_fit);
+    holdon;
+    plot(f,n_pprime);
+    holdoff;
+    #loading the data to the new material
+    newmaterialname=materialname_L+num2str(j);
+    if(findstring(setmaterial,newmaterialname) <= 0 ) { #add material if it does not already exist
+      tempname = addmaterial("Sampled data");
+      setmaterial(tempname,"name",newmaterialname);
+    }
+    setmaterial(newmaterialname,"sampled data",[x,eps_L]);
+    setmaterial(newmaterialname,"improve numerical stability",false); # set false to obtain a better fit
+    setmaterial(newmaterialname,"specify fit range",true);
+    setmaterial(newmaterialname,"make fit passive",false); 
+    setmaterial(newmaterialname,"wavelength min",0.45e-6); 
+    setmaterial(newmaterialname,"wavelength max",0.65e-6); 
+        
+}
