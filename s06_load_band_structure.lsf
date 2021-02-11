@@ -1,0 +1,36 @@
+clear;
+closeall;
+N=30;
+kx=linspace(0,0.5,N);
+ky=kx;
+lambdas=[450, 500, 550, 600]*1e-9;
+contour=zeros(N,N, length(lambdas));
+
+main_dir=pwd;
+for (i=1:N){
+    for (j=i:N){
+        file='rombic_cell_sweep_ky/sweep_ky'+num2str(i)+'_kx'+num2str(j)+'.fsp';
+        load(file);
+        cd(main_dir);
+        select('bandstructure'); 
+        set('f1',c/(min(lambdas)-100e-9));
+        set('f2',c/(max(lambdas)+100e-9));
+        spect=getresult('bandstructure','spectrum');
+        s=spect.fs;
+        lambda=spect.lambda;
+        for (k=1:length(lambdas)){
+            iso_lambda=lambdas(k);
+            #plot(lambda,s);
+            idx=find((lambda<iso_lambda+1e-9)&(lambda>iso_lambda-1e-9));
+            contour(i,j,k)=mean(s(idx));
+        }
+    }
+}
+
+for (k=1:length(lambdas)){
+    contour_plot=pinch(contour(:,:,k))+transpose(pinch(contour(:,:,k)));
+    image(kx,ky,contour_plot,"kx","Ky","isofrequency contour lambda="+num2str(lambdas(k))+"nm");
+}
+#image(kz,f*a/c,transpose(fs_all),"k (Gamma-kz)","f (Hz*a/c)","bandstructure, linearscale");
+setplot("colorbar min",0);
+#setplot("colorbar max",max(contour)*1e-4);

@@ -3,16 +3,14 @@
 
 main_dir = pwd; 
 
-
-sim_name = 'variability_study';
+sim_name = 'n_eff_variability';
 folder = 'SIM04_'+ sim_name;
 details = '_base';
 filename = folder +'/'+ sim_name + details + '.fsp';
 load(filename);
 cd(main_dir);
 
-
-newdetails = '_TM_Desc';
+newdetails = '_TM_gd3_buriedDBR';
 pattern_type = 'positive';
 
 # source
@@ -20,8 +18,7 @@ lambda=570e-9;
 width=30e-9;
 
 # multilayer
-
-design_file = 'Lumerical-Objects/multilayer_design/designs/design_TM_Descrovi.mat';
+design_file = 'Lumerical-Objects/multilayer_design/designs/design_TM_gd3_buriedDBR.mat';
 matlabload(design_file);  # contains layer description (n1, d, effective indeces)
 thickness = 75e-9;
 
@@ -35,12 +32,12 @@ if (pattern_type == 'positive') {
 } else {
     unkown_name;          # should send an error
 }
-N_dbr = 50;
+N_dbr = 40;
 cavity_diameter = 400e-9;
-period_dbr = round(lambda/(n_eff1+n_eff3)*1e9)*1e-9;
+?period_dbr = round(lambda/(n_eff1+n_eff3)*1e9)*1e-9;
 spacing_after_cavity = 1000e-9;
 
-newdetails = newdetails +'_N'+ num2str(N_dbr) +'_'+ pattern_type;
+newdetails = newdetails  +'_'+ pattern_type;#+'_N'+ num2str(N_dbr)
 
 # domain
 L=cavity_diameter+2*(N_dbr*period_dbr+spacing_after_cavity);
@@ -121,9 +118,8 @@ select("");
 
 filename = folder +'/'+ sim_name + newdetails + '.fsp';
 save(filename);
-run;
+#run;
 cd(main_dir);
 # Bip sound after finishing
-
-#system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
+system("speaker-test -t sine -f 300 -b 500 -l 1");# valid for alsamixer users only ([Hz],[ms])
 #system("powershell -c [console]::beep(500,500)"); # valid for windows only ([Hz],[ms])

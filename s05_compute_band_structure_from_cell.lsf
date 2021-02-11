@@ -1,0 +1,32 @@
+N=30;
+LAMBDA=0.4e-6;
+FF=0.4;
+kx=linspace(0,0.5,N);
+ky=kx;
+contour=zeros(N,N);
+
+main_dir=pwd;
+
+
+file_origin='rombic_cell.fsp';
+load(file_origin);
+setnamed('FDTD','x span',LAMBDA); 
+setnamed('FDTD','y span',LAMBDA);
+select('rounded rect');
+ set('x span',LAMBDA*sqrt(FF));
+ set('y span',LAMBDA*sqrt(FF));
+ set('radius',LAMBDA*sqrt(FF)/4);
+
+save(file_origin);
+
+for (i=1:N){
+    for (j=i:N){
+        load(file_origin);
+        file='rombic_cell_sweep_ky/sweep_ky'+num2str(i)+'_kx'+num2str(j)+'.fsp';
+        setnamed('FDTD','kx',kx(j));
+        setnamed('FDTD','ky',ky(i));
+        save(file);
+        run;
+        cd(main_dir);
+    }
+}

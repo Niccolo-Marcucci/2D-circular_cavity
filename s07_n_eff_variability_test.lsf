@@ -1,0 +1,85 @@
+
+main_dir = pwd; 
+
+sim_name = 'n_eff_variability';
+folder = 'SIM04_'+ sim_name;
+details = '_TM_gd3_buriedDBR';
+pattern_type ='positive';
+filename = folder +'/'+ sim_name + details + '_'+ pattern_type + '.fsp';
+
+n_eff_hi_max=1.827;
+n_eff_hi_min=1.749;
+
+n_eff_lo_max=1.677;
+n_eff_lo_min=1.648;
+
+
+n_eff_lo=zeros(6,5);
+n_eff_hi=n_eff_lo;
+
+n_eff_hi(:,1) = n_eff_hi_min+(n_eff_hi_max-n_eff_hi_min)/5*(0:5);
+
+n_eff_lo_0=(n_eff_lo_max+n_eff_lo_min)/4+n_eff_lo_max/2*(n_eff_hi-n_eff_hi_min)/(n_eff_hi_max-n_eff_hi_min)+n_eff_lo_min/2*(n_eff_hi_max-n_eff_hi)/(n_eff_hi_max-n_eff_hi_min);
+
+for (i=1:6) {
+    n_eff_hi(i,:)=n_eff_hi(i,1);
+    n_eff_lo(i,:)=n_eff_lo_0(i)+(n_eff_lo_max-n_eff_lo_min)/2/4*(-2:2);
+}
+
+for (i=1:6) {
+    for(j=1:5) {
+        load(filename);
+        cd(main_dir);
+        
+        if (pattern_type == 'positive') {
+            n_groove = round(n_eff_lo(i,j)*1e3)/1e3;
+            n_spacer = round(n_eff_hi(i,j)*1e3)/1e3;
+        } else if (pattern_type == 'negative'){
+            n_groove = round(n_eff_hi(i,j)*1e3)/1e3;
+            n_spacer = round(n_eff_lo(i,j)*1e3)/1e3;
+        } else {
+            unkown_name;          # should send an error
+        }
+        setnamed("FDTD","background index",n_spacer);
+        setnamed("circular cavity","n_groove",n_groove);
+        new_file= folder +'/sweep_n_search'+'/'+ sim_name + details + '_'+ pattern_type +'TMP.fsp';
+        save(new_file);
+        cd(main_dir);
+        
+        spacers_to_test = [300,550,0]*1e-9;
+        resonance =[1,1,1];
+        k=0;
+        for (found=0;found==0;0) {
+            k=k+1;
+            switchtolayout;
+            closeall;
+            if (k>2) {
+                ?D=(570-resonance(1))/(resonance(2)-resonance(1))*(550e-9-300e-9)+300e-9;
+                setnamed("circular cavity","D",D);
+            }else{
+                setnamed("circular cavity","D",spacers_to_test(k));
+            }
+            run;
+            cd(main_dir);
+            ?resonance(k)=getresult('resonance finder outside','resonance')*1e9;
+            if (resonance(k) < 574.5 & resonance(k) > 567){
+                found = 1;
+            } else if (k==3) {
+                if (resonance(3)>=572){
+                    resonance(2)=resonance(3);
+                    spacers_to_test(2)=D;
+                } else {
+                    resonance(1)=resonance(3);
+                    spacers_to_test(1)=D;
+                }
+                k=0;
+                #pause(2);
+            }
+        }
+            
+        newdetails =details+'_case'+num2str(i)+num2str(j)+'_D'+ num2str(round(D*1e9)) +'_'+ pattern_type;
+        new_file = folder +'/sweep_n_search'+'/'+ sim_name + newdetails + '.fsp';
+        save(new_file);
+        cd(main_dir);
+    }
+}
