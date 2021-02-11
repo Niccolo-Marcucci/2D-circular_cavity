@@ -1,0 +1,58 @@
+deleteall;
+
+main_dir = pwd; 
+
+sim_name = 'rombic_cell';
+folder = 'SIM04_bending_metasurface';
+filename = folder + '/' + sim_name + '.fsp';
+
+N=30;
+LAMBDA=0.4e-6;
+FF=0.4;
+kx=linspace(0,0.5,N);
+ky=kx;
+contour=zeros(N,N);
+
+Lumerical-Objects/rounded_rect.lsf
+    set('x span',LAMBDA*sqrt(FF));
+    set('y span',LAMBDA*sqrt(FF));
+    set('radius',LAMBDA*sqrt(FF)/4);
+cd(main_dir)
+
+addfdtd;
+set('x span',LAMBDA); 
+set('y span',LAMBDA);
+
+x_pos=[0, LAMBDA/4, -LAMBDA*3/4, LAMBDA*3/4];
+x_pos=[0, LAMBDA/4, +LAMBDA/4,  -LAMBDA/4];
+for (i=1:length(x_pos)){
+    addipole;
+        set("x",x_pos(i));
+        set("y",y_pos(i));
+        set("z",0);
+	set("override global source settings",1);
+	set("set wavelength",1);
+	set("optimize for short pulse",0);
+	set("center wavelength",570e-9);
+	set("wavelength span",100e-9);
+	set("phase",0);
+	set("theta",0);
+	set("phi",0);
+	set("dipole type","Electric Dipole");
+}
+
+select('rounded rect');
+
+save(filename);
+
+for (i=1:N){
+    for (j=i:N){
+        load(filename);
+        file=folder+ '/'+ sim_name + '_sweep_k/sweep_ky'+num2str(i)+ '_kx'+num2str(j)+ '.fsp';
+        setnamed('FDTD','kx',kx(j));
+        setnamed('FDTD','ky',ky(i));
+        save(file);
+        run;
+        cd(main_dir);
+    }
+}
