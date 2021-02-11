@@ -10,8 +10,8 @@ lib_dir = "Lumerical-Objects/";                                    # library dir
 
 main_dir = pwd;
 
-sim_name = 'test_mode_coupling';
-folder = 'SIM02_'+ sim_name;
+sim_name = 'variability_study';
+folder = 'SIM04_'+ sim_name;
 details = '_base';
 filename = folder +'/'+ sim_name + details + '.fsp';
 
